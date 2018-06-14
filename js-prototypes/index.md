@@ -1,9 +1,9 @@
 # JavaScript Prototypes
 
-The prototype is an essentail mechanism of JavaScript. Even with the advent
+The prototype is an essential mechanism of JavaScript. Even with the advent
 of `class`, it is not superseded and remains just as fundamental. I highly
 recommend [Jeremy Kyle's book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md) for a more detailed treatment of the subject. In this
-post, I attempt to summarise the prototype mechanism. I won't discuss the
+post, I attempt to summarize the prototype mechanism. I won't discuss the
 newer `class` mechanics as they don't change how prototypes work.
 
 ## The Prototype Chain
@@ -26,12 +26,12 @@ bar.x // => 42 ("inherited" from foo's prototype)
 bar.y // => undefined
 ```
 
-So in the code above we have two prototpye-linked objects. However, we didn't
+So in the code above we have two prototype-linked objects. However, we didn't
 link `foo` and `bar` directly. If we add a `y` property to `foo`, `bar` won't
 "inherit" it. What we're actually linking is _another_ object, the one
 created implicitly by JavaScript and accessible at `foo.prototype`.
 
-## Accessing linked prototype objects
+## Accessing Linked Prototype Objects
 
 Here's where things can get confusing: non-function objects don't
 normally have a "prototype" property, even though they _do_ have a prototype.
@@ -110,10 +110,10 @@ const obj = new foo()
 Object.getPrototypeOf(obj) === foo.prototype // => true
 ```
 
-When a function is caled as a constructor, JavaScript will create a brand new
-object (the one that will be returned) and it will set `this` to point to it
-for the duration of the function call. It will also set the object's internal
-`[[Prototype]]` property to point to the function's `prototype`.
+When a function is called as a constructor, JavaScript will create a brand
+new object (the one that will be returned) and it will set `this` to point to
+it for the duration of the function call. It will also set the object's
+internal `[[Prototype]]` property to point to the function's `prototype`.
 
 When you instantiate a sub-class, in most OO languages the super-class
 constructor is automatically called - unless you define a constructor for the
@@ -144,7 +144,7 @@ action in the `Foo` function. However, if we check the logs, we will see that
 we always get an entry without the user doing anything - it's because we run
 the `Foo` function to setup `Bar`'s prototype.
 
-## The `constructor` property
+## The `constructor` Property
 
 We saw that when JS creates a function object, it also creates the prototype
 object. This object has a "constructor" property, and it is a reference to
@@ -160,7 +160,7 @@ obj.constructor === foo // => true
 
 However, it's not safe to assume that if `obj.constructor === foo`, it means
 the object was created by `foo`. That's because the "prototype" property of
-function objects can be changed, so `prototype.construcor` can point to anything:
+function objects can be changed, so `prototype.constructor` can point to anything:
 
 ```js
 function foo() {}
@@ -172,7 +172,7 @@ const obj = new foo()
 obj.constructor === bar // => true
 ```
 
-## Setting properties
+## Setting Properties
 
 We saw that the prototype chain is actually pretty simple to understand, at
 least when it comes to _getting_ properties. If the object itself has a
@@ -187,7 +187,7 @@ finds an object in the target object's prototype chain which already has a
 property with the same name as the one we're trying to set/create on the
 target object.
 
-### Situation 1 - the property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
+### Situation 1 - The Property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
 
 In JS, if we want to run a function when setting a property, we can can use a
 setter. In this case, **JS will call the setter**. The setter function can
@@ -206,7 +206,7 @@ bar.myProp // => undefined
 bar.x // => 11
 ```
 
-### Situation 2 - the property is read-only
+### Situation 2 - The Property is Read-only
 
 We can create read-only properties using [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty):
 ```js
@@ -223,7 +223,7 @@ If `foo` is part of the prototype chain for `bar`, then we **can't set a
 "myProp" property on `bar`**. In other words, a read-only prop somewhere down
 the line in the prototype chain will prevent assigning a property with that
 name on the target object. In `strict` mode, an exception will be thrown;
-otherwise the assinment will just silently fail.
+otherwise the assignment will just silently fail.
 
 ```js
 // continuing previous example
@@ -269,15 +269,15 @@ object at the internal `[[Prototype]]` slot, and we can use either
 
 Reading the value of a property that is not on the target object will
 traverse the prototype chain and return the first one found, or `undefined`,
-whereas the algorhythm for setting such properties is more complex, calling
+whereas the algorithm for setting such properties is more complex, calling
 the first found setter and preventing the shadowing of read-only properties.
 
 ## Comments on the OO Paradigm in JavaScript
 
 Jeremy Kyle argues that the OO paradigm is not well suited for the
-dynamic nature of JavaScript, and preffers linking objects directly. I agree,
+dynamic nature of JavaScript, and prefers linking objects directly. I agree,
 but I think it is a lost cause - the overwhelming majority of developers use
 OO, either with `class` or by adding stuff to function object prototypes.
-Whether you preffer OO or linking objects directly, the prototype chain is
-essential, as `class` is mostly just syntactic sugar ontop of the prototype
+Whether you prefer OO or linking objects directly, the prototype chain is
+essential, as `class` is mostly just syntactic sugar on top of the prototype
 mechanism.
