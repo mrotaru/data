@@ -14,7 +14,7 @@ ways; one would be the familiar pattern of adding properties to the
 objects, so you can add properties to them. We don't have to add `prototype`
 explicitly though, JavaScript does it for us when we declare a function.
 Later, if we call the function with `new`, the created object will be
-prototype-linked to the functon's "prototype" property:
+prototype-linked to the function's "prototype" property:
 
 ```js
 function foo {}
