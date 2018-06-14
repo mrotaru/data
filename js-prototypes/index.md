@@ -14,14 +14,14 @@ ways; one would be the familiar pattern of adding properties to the
 objects, so you can add properties to them. We don't have to add `prototype`
 explicitly though, JavaScript does it for us when we declare a function.
 Later, if we call the function with `new`, the created object will be
-prototype-linked to `foo`'s prototype:
+prototype-linked to the functon's "prototype" property:
 
 ```js
 function foo {}
 typeof foo.prototype // => "object" (implicitly created by JavaScript)
 foo.prototype.x = 42 // linked objects will be able to access 'x'
 foo.y = 100 // foo is an object, so we can set any props we want on it
-const bar = new foo() // bar is prototype-lined to foo's prototype
+const bar = new foo() // bar is prototype-linked to foo's prototype
 bar.x // => 42 ("inherited" from foo's prototype)
 bar.y // => undefined
 ```
@@ -237,7 +237,7 @@ the value of that prop, the first one will be returned, thus "shadowing" the
 second one. I'm not sure why this is done _just_ for read-only properties,
 but that's how it is. Essentially, it means that if an object has a 'myProp'
 property that is read-only, then it can't _shadowed_ by objects which will
-add this object to their prototype chain. But, if the property is readable,
+add this object to their prototype chain. But, if the property is writable,
 you're free to shadow it !
 
 ```js
@@ -274,10 +274,10 @@ the first found setter and preventing the shadowing of read-only properties.
 
 ## Comments on the OO Paradigm in JavaScript
 
-Jeremy Kyle argues that the OO paradigm is not well suited for the
-dynamic nature of JavaScript, and prefers linking objects directly. I agree,
-but I think it is a lost cause - the overwhelming majority of developers use
-OO, either with `class` or by adding stuff to function object prototypes.
-Whether you prefer OO or linking objects directly, the prototype chain is
-essential, as `class` is mostly just syntactic sugar on top of the prototype
-mechanism.
+Jeremy Kyle argues that the OO paradigm is not well suited for the dynamic
+nature of JavaScript, and prefers linking objects directly. I agree, but I
+think it is a lost cause - the overwhelming majority of developers use OO,
+either with `class` or by adding stuff to function object prototypes.
+However, whether you prefer OO or linking objects directly, the prototype
+chain is essential, as `class` is mostly just syntactic sugar on top of the
+prototype mechanism.
