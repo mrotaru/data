@@ -19,9 +19,11 @@ internal `[[Prototype]]` is a reference to `bar`.
 
 ## The Prototype Chain
 
-Most objects have prototypes - this forms the prototype chain. The last
-"link" in this chain is normally `Object.prototype`, and it's `[[Prototype]]`
-is `null`.
+When we link `foo` and `bar`, `foo` will not only have access to `bar's`
+properties, but also to the properties on `bar`'s `[[Prototype]]`, and so on
+until one of the prototypes has a `null` `[[Prototype]]`. This forms the
+prototype chain. The last "link" in this chain is normally
+`Object.prototype`, and it's `[[Prototype]]` is `null`.
 
 How can we create a "prototype chain" ? There are multiple ways; one would be
 the familiar pattern of adding properties to the `prototype` of a `function`
