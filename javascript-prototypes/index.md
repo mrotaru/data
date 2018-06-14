@@ -6,15 +6,30 @@ recommend [Jeremy Kyle's book](https://github.com/getify/You-Dont-Know-JS/blob/m
 post, I attempt to summarize the prototype mechanism. I won't discuss the
 newer `class` mechanics as they don't change how prototypes work.
 
+## What is a Prototype ?
+
+A prototype is just an object that is referenced by _other_ objects via an
+internal property which the JavaScript spec calls "`[[Prototype]]` internal
+slot"
+[(1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots).
+This is used to "link" objects, so that one object can have access to
+properties (including functions) which are actually set on _another_ object.
+When we say that "`foo` is prototype-linked to `bar`" it means that `foo`'s
+internal `[[Prototype]]` is a reference to `bar`.
+
 ## The Prototype Chain
 
-First thing first; how can we create a "prototype chain" ? There are multiple
-ways; one would be the familiar pattern of adding properties to the
-`prototype` of a `function` object. In JavaScript, functions are also
-objects, so you can add properties to them. We don't have to add `prototype`
-explicitly though, JavaScript does it for us when we declare a function.
-Later, if we call the function with `new`, the created object will be
-prototype-linked to the function's "prototype" property:
+Most objects have prototypes - this forms the prototype chain. The last
+"link" in this chain is normally `Object.prototype`, and it's `[[Prototype]]`
+is `null`.
+
+How can we create a "prototype chain" ? There are multiple ways; one would be
+the familiar pattern of adding properties to the `prototype` of a `function`
+object. In JavaScript, functions are also objects, so you can add properties
+to them. We don't have to add `prototype` explicitly though, JavaScript does
+it for us when we declare a function. Later, if we call the function with
+`new`, the created object will be prototype-linked to the function's
+"prototype" property:
 
 ```js
 function foo {}
@@ -35,11 +50,7 @@ created implicitly by JavaScript and accessible at `foo.prototype`.
 
 Here's where things can get confusing: non-function objects don't
 normally have a "prototype" property, even though they _do_ have a prototype.
-The JavaScript spec calls it the "`[[Prototype]]` internal slot" [(1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots), and that's
-where it stores a reference to the object that will form the first link in
-the prototype chain for that particular object. When we say that "`foo` is
-prototype-linked to `bar`" it means that `foo`'s internal `[[Prototype]]` is
-a reference to `bar`.
+
 
 So if we want to grab a reference to this object, in other words, get the
 value of this `[[Prototype]]` thing, how do we do that ? The old and
@@ -228,8 +239,8 @@ otherwise the assignment will just silently fail.
 ```js
 // continuing previous example
 const bar = Object.create(foo)
-bar.myProp = 42 // nothing happens !
-bar.myProp // => undefined
+bar.myProp = 100 // nothing happens !
+bar.myProp // => 42
 ```
 This is to prevent _shadowing_ - which is what happens when two
 prototype-linked objects have properties with the same name; when reading
@@ -264,7 +275,7 @@ normally points to the function. We can create prototype-linked objects
 directly, with `Object.create`.
 
 We can use `__proto__` or `Object.getPrototypeOf` to get a reference to the
-object at the internal `[[Prototype]]` slot, and we can use either
+object referenced by the internal `[[Prototype]]` slot, and we can use either
 `__proto__` or `Object.setPrototypeOf` to set it's value.
 
 Reading the value of a property that is not on the target object will
