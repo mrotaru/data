@@ -142,11 +142,11 @@ prototype chain:
 Bar.prototype = Object.create(Foo)
 ```
 
-Why not just `Bar.prototype = Foo.prototype` ? Because then both functions
-would reference the same object as their prototype. If you add something to
-`Bar`'s prototype, it would also be inherited by all `Foo` instances. This is
-not desirable because super classes should not inherit from their
-sub-classes.
+Why not just `Bar.prototype = Foo.prototype` ? Because then the "prototype"
+property of both function objects would reference the exact same object. If
+you add something to `Bar`'s prototype, it would also be inherited by all
+`Foo` instances. This is not desirable because super classes should not
+inherit from their sub-classes.
 
 We could also try `Bar.prototype = new Foo()`; this would also make
 inheritance happen. However, this can have unwanted side-effects. Let's say
@@ -171,47 +171,93 @@ obj.constructor === foo // => true
 
 However, it's not safe to assume that if `obj.constructor === foo`, it means
 the object was created by `foo`. That's because the "prototype" property of
-function objects can be changed:
+function objects can be changed, so `prototype.construcor` can point to anything:
 
 ```js
 function foo() {}
+function bar() {}
 foo.prototype = {
-  constructor: "i'm not even a function!"
+  constructor: bar
 }
 const obj = new foo()
-obj.constructor // => "I'm not even a function!"
+obj.constructor === bar // => true
 ```
 
-## Getting and setting prototype properties
+## Setting properties
 
-But how does it work when trying to _set_ it ? You might think that it works
-the same as when trying to _get_ the value of a property which the object
-does not have, but one of the prototype-linked objects does. So if you try to
-set the value of such a property, you end up modifying the value found while
-traversing the prototype chain. So, in the example below, the statement
-`foo.x = 43` would modify `bar.x`, because `foo` does not have an `x`
-property, but `bar` does and it's linked to `foo`:
+We saw that the prototype chain is actually pretty simple to understand, at
+least when it comes to _getting_ properties - just traverse the prototype
+chain, and return the first found value.
+
+When we're setting the value of a property, it's a bit more complicated. In
+most situations, the property will be created on the target object. But
+before doing that, JS will traverse the prototype chain, and check if any of
+the linked objects has a property with the same name. And if it finds such an
+object, there are two situations in which it might not do what you expect.
+
+### Situation 1 - the property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
+
+In JS, if we want to run a function when setting a property, we can can use a
+setter. In this case, **JS will call the setter**. The setter function can
+use `this`, which will be a reference to the target object, _not_ the linked
+object:
 
 ```js
-const bar = { x: 42 }
-const foo = Object.create(bar)
-foo.x = 43
+const foo = {
+  set myProp(value) {
+    this.x = value + 1
+  }
+}
+const bar = Object.create(foo)
+bar.myProp = 10 // the setter will be called; `this` will be `bar`
+bar.myProp // => undefined
+bar.x // => 11
 ```
-### Situation 1 - one of the prototypes has a setter
 
-### Situation 2 - one of the prototypes 
+### Situation 2 - the property is read-only
 
-So what does JS do for `get` and `set` operations, when the targeted property already
-exists on one of the objects in the prototype chain:
+We can create read-only properties like using [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty):
+```js
+const foo = {}
+Object.defineProperty(foo, 'myProp', {
+  value: 42,
+  writable: false,
+})
+foo.myProp // => 42
+foo.myProp = 100 // ignored, or throws in "strict" mode
+foo.myProp // => 42
+```
+If `foo` is part of the prototype chain for `bar`, then we **can't set a
+"myProp" property on `bar`**. In other words, a read-only prop somewhere down
+the line in the prototype chain will prevent assigning a property with that
+name on the target object. In `strict` mode, an exception will be thrown;
+otherwise the assinment will just silently fail.
 
-- `get`: return the first found property value
-- `set`: **don't set the value of the existing property** - set it on the target object
+```js
+// continuing previous example
+const bar = Object.create(foo)
+bar.myProp = 42 // nothing happens !
+bar.myProp // => undefined
+```
+This is to prevent _shadowing_ - which is what happens when two
+prototype-linked objects have properties with the same name; when reading
+the value of that prop, the first one will be returned, thus "shadowing" the
+second one. I'm not sure why this is done _just_ for read-only properties,
+but that's how it is. Essentially, it means that if an object 'myProp'
+property that is read-only, then it can't _shadowed_ by objects which will
+add this object to their prototype chain. But, if the property is readable,
+you're free to shadow it !
 
-## Introspection
-
-## Comparing JavaScript `class`es with classes in other languages
-
-With a good understanding of how inheritance happens in JavaScript, we can
-now compare it to other object-oriented languages. We will see that they are
-fundamentally different approaches that really don't have much in common,
-even thought the syntax is almost identical.
+```js
+const foo = {}
+Object.defineProperties(foo, {
+  'myReadOnlyProp': { value: 42, writable: false },
+  'myWritableProp': { value: 10, writable: true }
+})
+const bar = Object.create(foo)
+bar.myReadOnlyProp = 100 // can't shadow read-only props, nothing happens
+bar.myReadOnlyProp // => 42
+bar.myWritableProp = 100 // can shadow writable props; prop created on `bar`
+foo.myWritableProp // => 10; the shadowed property is unaffected
+bar.myWritableProp // => 100
+```
