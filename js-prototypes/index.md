@@ -1,21 +1,10 @@
 # JavaScript Prototypes
 
-There is hardyly anything more important in JavaScript than understanding how
-the prototype chain works. Even if we can use the `class` syntax nowadays, it
-still uses prototypes under the hood. Understanding prototypes is, perhaps,
-even _more_ important when using `class` because if you're coming from a more
-traditional object-oriented language, such as Java or C++, you might make some
-assumptions that are not true.
-
-> It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so.
-
-It is intuitivelly simple - you just add properties to a function's
-`prototype` and they become available to objects created when that function
-is called with `new`. But how does that actually work ? What's the
-difference between `prototype`, `__proto__`, and how do they relate to
-functions like `getPrototypeOf` and `setPrototypeOf` ? How does the
-`constructor` property work ? The answers to these questions might not be as
-simple as one expects.
+The prototype is an essentail mechanism of JavaScript. Even with the advent
+of `class`, it is not superseded and remains just as fundamental. I highly
+recommend [Jeremy Kyle's book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md) for a more detailed treatment of the subject. In this
+post, I attempt to summarise the prototype mechanism. I won't discuss the
+newer `class` mechanics as they don't change how prototypes work.
 
 ## The Prototype Chain
 
@@ -30,7 +19,7 @@ prototype-linked to `foo`'s prototype:
 ```js
 function foo {}
 typeof foo.prototype // => "object" (implicitly created by JavaScript)
-foo.prototype.x = 42 // linked objects can access these properties 
+foo.prototype.x = 42 // linked objects will be able to access 'x'
 foo.y = 100 // foo is an object, so we can set any props we want on it
 const bar = new foo() // bar is prototype-lined to foo's prototype
 bar.x // => 42 ("inherited" from foo's prototype)
@@ -67,7 +56,7 @@ bar.__proto__ === Object.getPrototypeOf(bar) // => true
 foo.prototype !== foo.__proto__ // => true - two completely different objects
 ```
 
-## Linking objects explicitly
+## Linking Objects Explicitly
 
 Note how we had to create a function object, but the properties which we want
 to be "inherited" are not set on it directly, but on another object
@@ -94,7 +83,7 @@ Object.getPrototypeOf(bar) === foo // => true
 bar.x // => 42
 ```
 
-## Implementing prototypal inheritance
+## Implementing Object-Oriented Prototypal Inheritance
 
 Prototypes are often used "in the wild" to implement object-oriented patterns
 common in other languages. So you'd see something like this:
@@ -159,8 +148,8 @@ the `Foo` function to setup `Bar`'s prototype.
 
 We saw that when JS creates a function object, it also creates the prototype
 object. This object has a "constructor" property, and it is a reference to
-the function object. Because it's on the prototype, it will be accessible
-to objects created by the function with `new`:
+the function object. Because it's on the prototype, it will be inherited
+by objects created by the function with `new`:
 
 ```js
 function foo() {}
@@ -186,14 +175,17 @@ obj.constructor === bar // => true
 ## Setting properties
 
 We saw that the prototype chain is actually pretty simple to understand, at
-least when it comes to _getting_ properties - just traverse the prototype
+least when it comes to _getting_ properties. If the object itself has a
+property with that name, return that. Otherwise, just traverse the prototype
 chain, and return the first found value.
 
 When we're setting the value of a property, it's a bit more complicated. In
-most situations, the property will be created on the target object. But
-before doing that, JS will traverse the prototype chain, and check if any of
-the linked objects has a property with the same name. And if it finds such an
-object, there are two situations in which it might not do what you expect.
+most situations, the result will be the creation or modification of a
+property on the target object (`bar` in the examples below). But there are
+two situations in which that will not happen. Both of them occur when JS
+finds an object in the target object's prototype chain which already has a
+property with the same name as the one we're trying to set/create on the
+target object.
 
 ### Situation 1 - the property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
 
@@ -208,7 +200,7 @@ const foo = {
     this.x = value + 1
   }
 }
-const bar = Object.create(foo)
+const bar = Object.create(foo) // 'bar' is the target object
 bar.myProp = 10 // the setter will be called; `this` will be `bar`
 bar.myProp // => undefined
 bar.x // => 11
@@ -216,7 +208,7 @@ bar.x // => 11
 
 ### Situation 2 - the property is read-only
 
-We can create read-only properties like using [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty):
+We can create read-only properties using [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty):
 ```js
 const foo = {}
 Object.defineProperty(foo, 'myProp', {
@@ -243,7 +235,7 @@ This is to prevent _shadowing_ - which is what happens when two
 prototype-linked objects have properties with the same name; when reading
 the value of that prop, the first one will be returned, thus "shadowing" the
 second one. I'm not sure why this is done _just_ for read-only properties,
-but that's how it is. Essentially, it means that if an object 'myProp'
+but that's how it is. Essentially, it means that if an object has a 'myProp'
 property that is read-only, then it can't _shadowed_ by objects which will
 add this object to their prototype chain. But, if the property is readable,
 you're free to shadow it !
@@ -261,3 +253,31 @@ bar.myWritableProp = 100 // can shadow writable props; prop created on `bar`
 foo.myWritableProp // => 10; the shadowed property is unaffected
 bar.myWritableProp // => 100
 ```
+
+## Summary
+
+JS automatically adds a "prototype" property to function objects. When we
+instantiate objects by calling the function as a constructor (with `new`),
+the created objects will have access to properties on the `prototype` object.
+One such property is the `constructor` property, added by JS and which
+normally points to the function. We can create prototype-linked objects
+directly, with `Object.create`.
+
+We can use `__proto__` or `Object.getPrototypeOf` to get a reference to the
+object at the internal `[[Prototype]]` slot, and we can use either
+`__proto__` or `Object.setPrototypeOf` to set it's value.
+
+Reading the value of a property that is not on the target object will
+traverse the prototype chain and return the first one found, or `undefined`,
+whereas the algorhythm for setting such properties is more complex, calling
+the first found setter and preventing the shadowing of read-only properties.
+
+## Comments on the OO Paradigm in JavaScript
+
+Jeremy Kyle argues that the OO paradigm is not well suited for the
+dynamic nature of JavaScript, and preffers linking objects directly. I agree,
+but I think it is a lost cause - the overwhelming majority of developers use
+OO, either with `class` or by adding stuff to function object prototypes.
+Whether you preffer OO or linking objects directly, the prototype chain is
+essential, as `class` is mostly just syntactic sugar ontop of the prototype
+mechanism.
