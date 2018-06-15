@@ -53,7 +53,6 @@ created implicitly by JavaScript and accessible at `foo.prototype`.
 Here's where things can get confusing: non-function objects don't
 normally have a "prototype" property, even though they _do_ have a prototype.
 
-
 So if we want to grab a reference to this object, in other words, get the
 value of this `[[Prototype]]` thing, how do we do that ? The old and
 deprecated way is with `__proto__`; the new and recommended way is by using
@@ -130,7 +129,8 @@ internal `[[Prototype]]` property to point to the function's `prototype`.
 
 When you instantiate a sub-class, in most OO languages the super-class
 constructor is automatically called - unless you define a constructor for the
-subclass. Therefore, need to make sure to call the parent function:
+subclass. Therefore, we need to make sure to call the parent function, which
+is also the super-class constructor:
 
 ```js
 function Bar (initialCount) {
@@ -182,23 +182,17 @@ foo.prototype = {
   constructor: bar
 }
 const obj = new foo()
-obj.constructor === bar // => true
+obj.constructor === bar // => true - `constructor` is inherited
 ```
 
 ## Setting Properties
 
-We saw that the prototype chain is actually pretty simple to understand, at
-least when it comes to _getting_ properties. If the object itself has a
-property with that name, return that. Otherwise, just traverse the prototype
-chain, and return the first found value.
-
-When we're setting the value of a property, it's a bit more complicated. In
-most situations, the result will be the creation or modification of a
-property on the target object (`bar` in the examples below). But there are
-two situations in which that will not happen. Both of them occur when JS
-finds an object in the target object's prototype chain which already has a
-property with the same name as the one we're trying to set/create on the
-target object.
+In most cases, when setting the value of a property, the result will be the
+creation or modification of a property on the target object (`bar` in the
+examples below). But there are two situations in which that will not happen,
+at least not as expected. Both of them occur when JS finds an object in the
+target object's prototype chain which already has a property with the same
+name as the one we're trying to set/create on the target object.
 
 ### Situation 1 - The Property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
 
