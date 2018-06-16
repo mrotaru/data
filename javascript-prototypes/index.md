@@ -9,13 +9,13 @@ newer `class` mechanics as they don't change how prototypes work.
 ## What is a Prototype ?
 
 A prototype is just an object that is referenced by _other_ objects via an
-internal property which the JavaScript spec calls "`[[Prototype]]` internal
-slot"
-[(1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots).
-This is used to "link" objects, so that one object can have access to
-properties (including functions) which are actually set on _another_ object.
-When we say that "`foo` is prototype-linked to `bar`" it means that `foo`'s
-internal `[[Prototype]]` is a reference to `bar`.
+internal property. This allows one object access to properties (including
+functions) which are actually set on _another_ object. The JavaScript spec
+calls this internal property "`[[Prototype]]` internal slot"
+[(1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots)
+and it is _not_ the same thing as the `prototype` property. When we say that
+"`foo` is prototype-linked to `bar`" it means that `foo`'s internal
+`[[Prototype]]` is a reference to `bar`.
 
 ## The Prototype Chain
 
@@ -34,11 +34,11 @@ it for us when we declare a function. Later, if we call the function with
 "prototype" property:
 
 ```js
-function foo {}
+function foo() {} // foo is a function object
 typeof foo.prototype // => "object" (implicitly created by JavaScript)
 foo.prototype.x = 42 // linked objects will be able to access 'x'
-foo.y = 100 // foo is an object, so we can set any props we want on it
-const bar = new foo() // bar is prototype-linked to foo's prototype
+foo.y = 100 // because functions are objects, so we can set props on them
+const bar = new foo() // bar is prototype-linked to foo.prototype
 bar.x // => 42 ("inherited" from foo's prototype)
 bar.y // => undefined
 ```
@@ -50,16 +50,15 @@ created implicitly by JavaScript and accessible at `foo.prototype`.
 
 ## Accessing Linked Prototype Objects
 
-Here's where things can get confusing: non-function objects don't
-normally have a "prototype" property, even though they _do_ have a prototype.
-
-So if we want to grab a reference to this object, in other words, get the
-value of this `[[Prototype]]` thing, how do we do that ? The old and
-deprecated way is with `__proto__`; the new and recommended way is by using
+Here's where things can get confusing: non-function objects don't normally
+have a "prototype" property, even though they _do_ have a prototype. So how
+can we get a reference to this object ? In other words, how can we get the
+value of the `[[Prototype]]` internal property ? The old and deprecated way
+is with `__proto__`; the new and recommended way is by using
 `Object.getPrototypeOf`:
 
 ```js
-function foo {}
+function foo() {}
 const bar = new foo()
 foo.prototype // => {} - an empty object
 bar.prototype // => undefined
@@ -78,7 +77,7 @@ directly ? Yes we can, using `Object.create`:
 
 ```js
 const foo = { x: 42 }
-const bar = Object.create(foo)
+const bar = Object.create(foo) // bar is prototype-linked to foo
 bar.x // => 42 - inherited from foo, through the prototype chain
 Object.getPrototypeOf(bar) === foo // true - direct, explicit link !
 ```
@@ -113,24 +112,29 @@ const instance = new Foo(0)
 
 `Foo` is just a normal function, but if we call with `new`, it will act as a
 constructor. In JavaScript, **any** function becomes a constructor when
-called with `new`; even a function like `function foo = {}` will still return
-a new object, prototype-linked to `foo.prototype`:
+called with `new`. As we saw previously, even a function like `function foo = {}` will still return
+a new object, prototype-linked to `foo.prototype`.
+
+Just before executing a constructor call, JavaScript will create a brand new
+object and it will set `this` to point to it for the duration of the
+constructor function's execution. It will also set the object's internal
+`[[Prototype]]` property to point to the function's `prototype`. At the end
+of the execution, the return value of the function is this newly created
+object; the class _instance_. JavaScript will automatically set it as the
+return value. Note that this happens only if a function is called with `new`:
 
 ```js
-function foo {}
-const obj = new foo()
-Object.getPrototypeOf(obj) === foo.prototype // => true
+const o1 = new Foo(10) // o1: { count: 42 } 
+o1.incrementCount()
+o1.count // => 11
+const o2 = Foo() // o2: undefined; side-effect: window.x === 42
 ```
 
-When a function is called as a constructor, JavaScript will create a brand
-new object (the one that will be returned) and it will set `this` to point to
-it for the duration of the function call. It will also set the object's
-internal `[[Prototype]]` property to point to the function's `prototype`.
-
-When you instantiate a sub-class, in most OO languages the super-class
-constructor is automatically called - unless you define a constructor for the
-subclass. Therefore, we need to make sure to call the parent function, which
-is also the super-class constructor:
+To make our JavaScript pseudo-classes behave as in most OO languages, we
+need to do a bit more work. One such thing is calling the "parent"
+constructor; when the sub-class is instantiated, one would expect the
+super-class constructor to be called. Therefore, we need to make sure to call
+the parent function, which is also the super-class constructor:
 
 ```js
 function Bar (initialCount) {
