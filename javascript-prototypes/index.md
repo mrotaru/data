@@ -1,10 +1,19 @@
 # JavaScript Prototypes
 
-The prototype is an essential mechanism of JavaScript. Even with the advent
-of `class`, it is not superseded and remains just as fundamental. I highly
-recommend [Jeremy Kyle's book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md) for a more detailed treatment of the subject. In this
-post, I attempt to summarize the prototype mechanism. I won't discuss the
-newer `class` mechanics as they don't change how prototypes work.
+<small>Author: <a href="https://mrotaru.co.uk">Mihai Rotaru</a></small> <small>Date: 2018-06-14</small>
+
+JavaScript is a prototype-based language, thus it should come as no surprise
+that a good grasp of how prototypes work is essential to any serious
+JavaScript developer. I've struggled with it, until I read [Jeremy Kyle's
+book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md)
+on the subject, which I cannot recommend enough. I wrote this post to
+solidify my understanding; "if you can't explain it, you don't understand
+it". As it turns out, the prototype mechanism is actually very simple and
+elegant. However, it is not ideally suited for object-oriented programming as
+in other languages, such as Java or C++. Using it like that complicates
+things, but given that it is a common pattern it is still important to
+understand all the implications; ES6 `class`es do not supersede the prototype
+mechanism.
 
 ## What is a Prototype ?
 
@@ -39,7 +48,7 @@ typeof foo.prototype // => "object" (implicitly created by JavaScript)
 foo.prototype.x = 42 // linked objects will be able to access 'x'
 foo.y = 100 // because functions are objects, so we can set props on them
 const bar = new foo() // bar is prototype-linked to foo.prototype
-bar.x // => 42 ("inherited" from foo's prototype)
+bar.x // => 42 - "inherited" from foo.prototype
 bar.y // => undefined
 ```
 
@@ -94,7 +103,7 @@ Object.getPrototypeOf(bar) === foo // => true
 bar.x // => 42
 ```
 
-## Implementing Object-Oriented Prototypal Inheritance
+## Implementing Classes with Prototypes
 
 Prototypes are often used "in the wild" to implement object-oriented patterns
 common in other languages. So you'd see something like this:
@@ -124,13 +133,21 @@ object; the class _instance_. JavaScript will automatically set it as the
 return value. Note that this happens only if a function is called with `new`:
 
 ```js
-const o1 = new Foo(10) // o1: { count: 42 } 
+const o1 = new Foo(10) // o1: { count: 10 } 
 o1.incrementCount()
 o1.count // => 11
-const o2 = Foo() // o2: undefined; side-effect: window.x === 42
+const o2 = Foo() // o2: undefined; possible side-effect: window.count === 42
 ```
 
-To make our JavaScript pseudo-classes behave as in most OO languages, we
+When we call a function without `new`, it won't implicitly create and return
+a new object. So what will `this` point to, then ? Because `this` is bound at
+run-time, it really depends on how the function was called. If a function is
+not called as the prop of an object, and is not bound (with `bind` or with
+`call/apply`) then `this` will be the global object. For browsers, that's
+`window`; hence the unwanted side-effect in the example above. [More details
+on `this`.](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md)
+
+To make JavaScript functions behave as classes do in most OO languages, we
 need to do a bit more work. One such thing is calling the "parent"
 constructor; when the sub-class is instantiated, one would expect the
 super-class constructor to be called. Therefore, we need to make sure to call
@@ -247,7 +264,7 @@ prototype-linked objects have properties with the same name; when reading
 the value of that prop, the first one will be returned, thus "shadowing" the
 second one. I'm not sure why this is done _just_ for read-only properties,
 but that's how it is. Essentially, it means that if an object has a 'myProp'
-property that is read-only, then it can't _shadowed_ by objects which will
+property that is read-only, then it can't be _shadowed_ by objects which will
 add this object to their prototype chain. But, if the property is writable,
 you're free to shadow it !
 
@@ -282,13 +299,3 @@ Reading the value of a property that is not on the target object will
 traverse the prototype chain and return the first one found, or `undefined`,
 whereas the algorithm for setting such properties is more complex, calling
 the first found setter and preventing the shadowing of read-only properties.
-
-## Comments on the OO Paradigm in JavaScript
-
-Jeremy Kyle argues that the OO paradigm is not well suited for the dynamic
-nature of JavaScript, and prefers linking objects directly. I agree, but I
-think it is a lost cause - the overwhelming majority of developers use OO,
-either with `class` or by adding stuff to function object prototypes.
-However, whether you prefer OO or linking objects directly, the prototype
-chain is essential, as `class` is mostly just syntactic sugar on top of the
-prototype mechanism.
