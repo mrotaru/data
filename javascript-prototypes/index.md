@@ -4,7 +4,7 @@
 
 JavaScript is a prototype-based language, thus it should come as no surprise
 that a good grasp of how prototypes work is essential to any serious
-JavaScript developer. I've struggled with it, until I read [Jeremy Kyle's
+JavaScript developer. I've struggled with it, until I read [Kyle Simpson's
 book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md)
 on the subject, which I cannot recommend enough. I wrote this post to
 solidify my understanding; "if you can't explain it, you don't understand
