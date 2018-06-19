@@ -121,7 +121,7 @@ const instance = new Foo(0)
 
 `Foo` is just a normal function, but if we call with `new`, it will act as a
 constructor. In JavaScript, **any** function becomes a constructor when
-called with `new`. As we saw previously, even a function like `function foo = {}` will still return
+called with `new`. As we saw previously, even a function like `function foo () {}` will still return
 a new object, prototype-linked to `foo.prototype`.
 
 Just before executing a constructor call, JavaScript will create a brand new
@@ -136,7 +136,7 @@ return value. Note that this happens only if a function is called with `new`:
 const o1 = new Foo(10) // o1: { count: 10 } 
 o1.incrementCount()
 o1.count // => 11
-const o2 = Foo() // o2: undefined; possible side-effect: window.count === 42
+const o2 = Foo(10) // o2: undefined; possible side-effect: window.count === 10
 ```
 
 When we call a function without `new`, it won't implicitly create and return
