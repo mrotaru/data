@@ -21,35 +21,41 @@ A prototype is just an object that is referenced by _other_ objects via an
 internal property. This allows one object access to properties (including
 functions) which are actually set on _another_ object. The JavaScript spec
 calls this internal property "`[[Prototype]]` internal slot"
-[(1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots)
-and it is _not_ the same thing as the `prototype` property. When we say that
+[(§ 9.1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots)
+and it is _not_ the same thing as the `prototype` property; more on this later. When we say that
 "`foo` is prototype-linked to `bar`" it means that `foo`'s internal
 `[[Prototype]]` is a reference to `bar`.
 
 ## Creating Prototype Links
 
 There are two main ways of creating prototype links: one is direct (explicit) and the other
-one is indirect (implicit). The direct way is by using [`Object.create`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create).
+one is indirect (implicit). The direct way is by using [`Object.create()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create).
 It will return a new object,
-with it's internal `[[Prototype]]` pointing to the object we give as it's first parameter:
+with it's internal `[[Prototype]]` pointing to the object provided as the first parameter. `[[Prototype]]`
+can be accessed directly as the `__proto__` property, although it is recommened to use `Object.getPrototypeOf()` instead.
 
 ```js
 const foo = { x: 42 }
 const bar = Object.create(foo) // bar is prototype-linked to foo
-bar.x // => 42 - inherited from foo, through the prototype chain
-Object.getPrototypeOf(bar) === foo // true - direct, explicit link !
+bar.x // => 42 - bar.x was inherited from foo, through the prototype link
+Object.getPrototypeOf(bar) === foo // => true
+bar.__proto__ === foo // => true
 ```
 
 ![Direct, explicit prototype link](./fig-1.svg)
 
+## Default Prototype Links
 
+You probably know that all objects have access to functions like `toString()` and `hasOwnProperty()`, even
+brand new ones. This is because all objects have `Object.prototype` in their prototype chain by default,
+and properties are resolved recursively. If an object doesn't have the property we're trying to access,
+the prototype chain will be traversed until it is found, or `undefined` is returned. `Object.prototype` is
+normally the last link in the prototype chain, and it's `[[Prototype]]` is `null`.
 
-```js
-function double(n) { return 2 * n }
-foo.double = double
-bar.double(42) // => 84 - functions are also inherited
-```
+Thanks to the prototype chain, `bar` has access not only to the properties of `foo`, but to those
+of `Object.prototype` as well.
 
+![Direct, explicit prototype link](./fig-2.svg)
 
 If `bar` is the prototype of `foo`, `foo` foo will have access to all the
 properties of `bar`. But it doesn't stop there, because `bar` might also have
@@ -70,6 +76,7 @@ baz.y // => 10
 baz.z = 20
 bar.z // undefined; inheritance only works in one direction
 ```
+
 
 How can we create a "prototype chain" ? There are multiple ways; one would be
 the familiar pattern of adding properties to the `prototype` of a `function`
@@ -106,7 +113,7 @@ Object.getPrototypeOf(bar) === foo // => true
 bar.x // => 42
 ```
 
-## Accessing Linked Prototype Objects
+## Function Objects
 
 Here's where things can get confusing: non-function objects don't normally
 have a "prototype" property, even though they _do_ have a prototype. So how
@@ -126,7 +133,7 @@ foo.prototype !== foo.__proto__ // => true - two completely different objects
 ```
 
 
-## Implementing Classes with Prototypes
+## Implementing Classes with Function Objects
 
 Prototypes are often used "in the wild" to implement object-oriented patterns
 common in other languages. So you'd see something like this:
