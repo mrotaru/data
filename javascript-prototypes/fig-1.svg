@@ -65,6 +65,38 @@
          result="composite2"
          id="feComposite5925" />
     </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Drop Shadow"
+       id="filter5927-6">
+      <feFlood
+         flood-opacity="0.466667"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood5917-2" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite5919-6" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="1.7"
+         result="blur"
+         id="feGaussianBlur5921-1" />
+      <feOffset
+         dx="1"
+         dy="1"
+         result="offset"
+         id="feOffset5923-8" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite5925-7" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -74,8 +106,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="198.64818"
-     inkscape:cy="-121.13122"
+     inkscape:cx="265.14735"
+     inkscape:cy="-85.94678"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -87,7 +119,8 @@
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     units="in" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -111,66 +144,66 @@
        height="39.00882"
        x="87.537033"
        y="21.585014"
-       style="fill:#f2f2f2;stroke:#000000;stroke-width:1.37485695;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5927)" />
+       style="fill:#e6e6e6;stroke:#000000;stroke-width:1.37485695;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5927)"
+       transform="matrix(0.75,0,0,0.75,19.610902,9.3146461)" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="107.26638"
-       y="17.703342"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.9375px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.19843748"
+       x="100.06068"
+       y="22.592154"
        id="text4795"><tspan
          sodipodi:role="line"
          id="tspan4793"
-         x="107.26638"
-         y="17.703342"
-         style="stroke-width:0.26458332">foo</tspan></text>
+         x="100.06068"
+         y="22.592154"
+         style="stroke-width:0.19843748">foo</tspan></text>
     <rect
-       style="fill:#f2f2f2;stroke:#000000;stroke-width:1.37485695;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5927)"
+       style="fill:#e6e6e6;stroke:#000000;stroke-width:1.37485695;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5927)"
        y="21.259537"
        x="16.710613"
        height="39.00882"
        width="52.639572"
-       id="rect6003" />
+       id="rect6003"
+       transform="matrix(0.75,0,0,0.75,19.610902,9.3146461)" />
     <text
        id="text6007"
-       y="17.377865"
-       x="36.43996"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       y="22.348045"
+       x="46.940872"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.9375px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.19843748"
        xml:space="preserve"><tspan
-         style="stroke-width:0.26458332"
-         y="17.377865"
-         x="36.43996"
+         style="stroke-width:0.19843748"
+         y="22.348045"
+         x="46.940872"
          id="tspan6005"
          sodipodi:role="line">bar</tspan></text>
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-       d="M 62.808338,49.775686 85.666146,49.375498"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
+       d="M 66.717156,46.646411 83.860512,46.34627"
        id="path6044"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="3"
        sodipodi:nodetypes="cc" />
-    <flowRoot
+    <text
        xml:space="preserve"
-       id="flowRoot6901"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
-       transform="matrix(0.26458333,0,0,0.26458333,-0.47582497,-3.7417734)"><flowRegion
-         id="flowRegion6903"><rect
-           id="rect6905"
-           width="137.38075"
-           height="59.598999"
-           x="359.61432"
-           y="99.235153" /></flowRegion><flowPara
-         id="flowPara6907">x: 42</flowPara></flowRoot>    <flowRoot
-       transform="matrix(0.26458333,0,0,0.26458333,3.914169,-2.9981724)"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#808080;fill-opacity:1;stroke:none"
-       id="flowRoot6015"
-       xml:space="preserve"><flowRegion
-         style="fill:#808080"
-         id="flowRegion6011"><rect
-           style="fill:#808080"
-           y="172.97629"
-           x="73.741135"
-           height="62.809082"
-           width="158.77359"
-           id="rect6009" /></flowRegion><flowPara
-         id="flowPara6013">[[ proto ]]</flowPara></flowRoot>  </g>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.9375px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#808080;fill-opacity:1;stroke:none;stroke-width:0.19843748"
+       x="36.414433"
+       y="48.865791"
+       id="text7018"><tspan
+         sodipodi:role="line"
+         id="tspan7016"
+         x="36.414433"
+         y="48.865791"
+         style="fill:#808080;stroke-width:0.19843748">[[ proto ]]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.9375px;line-height:1.25;font-family:'Delicious Heavy';-inkscape-font-specification:'Delicious Heavy, ';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.19843748"
+       x="89.534248"
+       y="33.230526"
+       id="text7022"><tspan
+         sodipodi:role="line"
+         id="tspan7020"
+         x="89.534248"
+         y="33.230526"
+         style="stroke-width:0.19843748">x: 42</tspan></text>
+  </g>
 </svg>
