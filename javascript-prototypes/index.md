@@ -26,13 +26,50 @@ and it is _not_ the same thing as the `prototype` property. When we say that
 "`foo` is prototype-linked to `bar`" it means that `foo`'s internal
 `[[Prototype]]` is a reference to `bar`.
 
-## The Prototype Chain
+## Creating Prototype Links
 
-When we link `foo` and `bar`, `foo` will not only have access to `bar's`
-properties, but also to the properties on `bar`'s `[[Prototype]]`, and so on
-until one of the prototypes has a `null` `[[Prototype]]`. This forms the
-prototype chain. The last "link" in this chain is normally
-`Object.prototype`, and it's `[[Prototype]]` is `null`.
+There are two main ways of creating prototype links: one is direct (explicit) and the other
+one is indirect (implicit). The direct way is by using [`Object.create`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create).
+It will return a new object,
+with it's internal `[[Prototype]]` pointing to the object we give as it's first parameter:
+
+```js
+const foo = { x: 42 }
+const bar = Object.create(foo) // bar is prototype-linked to foo
+bar.x // => 42 - inherited from foo, through the prototype chain
+Object.getPrototypeOf(bar) === foo // true - direct, explicit link !
+```
+
+![Direct, explicit prototype link](./fig-1.svg)
+
+
+
+```js
+function double(n) { return 2 * n }
+foo.double = double
+bar.double(42) // => 84 - functions are also inherited
+```
+
+
+If `bar` is the prototype of `foo`, `foo` foo will have access to all the
+properties of `bar`. But it doesn't stop there, because `bar` might also have
+a `[[Prototype]]` link to another object, which can also have a `[[Prototype]]`,
+and so on until one of these prototype objects as a `null` `[[Prototype]]`.
+All these linked prototype objects form the _prototype chain_, and properties
+on these objects are accessible by objects upstream. In other words, if we have
+this chain: `foo -> bar -> baz`, then `foo` will have access to all properties
+downstream; so to both `foo` and `bar`s properties.
+
+```js
+const foo = { x: 42 }
+const bar = Object.create(foo)
+bar.y = 10
+const baz = Object.create(bar)
+baz.x // => 42
+baz.y // => 10
+baz.z = 20
+bar.z // undefined; inheritance only works in one direction
+```
 
 How can we create a "prototype chain" ? There are multiple ways; one would be
 the familiar pattern of adding properties to the `prototype` of a `function`
@@ -57,6 +94,18 @@ link `foo` and `bar` directly. If we add a `y` property to `foo`, `bar` won't
 "inherit" it. What we're actually linking is _another_ object, the one
 created implicitly by JavaScript and accessible at `foo.prototype`.
 
+We can also use `Object.setPrototypeOf` to re-link existing objects, but note
+that this is not recommended because [changing the prototype is an expensive
+operation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf):
+
+```js
+const foo = { x: 42 }
+const bar = {}
+Object.setPrototypeOf(bar, foo)
+Object.getPrototypeOf(bar) === foo // => true
+bar.x // => 42
+```
+
 ## Accessing Linked Prototype Objects
 
 Here's where things can get confusing: non-function objects don't normally
@@ -76,32 +125,6 @@ bar.__proto__ === Object.getPrototypeOf(bar) // => true
 foo.prototype !== foo.__proto__ // => true - two completely different objects
 ```
 
-## Linking Objects Explicitly
-
-Note how we had to create a function object, but the properties which we want
-to be "inherited" are not set on it directly, but on another object
-JavaScript creates automatically and attaches it to the function object as
-the value of the "prototype" property. But can't we just link two objects
-directly ? Yes we can, using `Object.create`:
-
-```js
-const foo = { x: 42 }
-const bar = Object.create(foo) // bar is prototype-linked to foo
-bar.x // => 42 - inherited from foo, through the prototype chain
-Object.getPrototypeOf(bar) === foo // true - direct, explicit link !
-```
-
-We can also use `Object.setPrototypeOf` to re-link existing objects, but note
-that this is not recommended because [changing the prototype is an expensive
-operation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf):
-
-```js
-const foo = { x: 42 }
-const bar = {}
-Object.setPrototypeOf(bar, foo)
-Object.getPrototypeOf(bar) === foo // => true
-bar.x // => 42
-```
 
 ## Implementing Classes with Prototypes
 
