@@ -159,6 +159,12 @@ object; the class _instance_. JavaScript will automatically set it as the
 return value. Note that this happens only if a function is called with `new`:
 
 ```js
+function Foo (initialCount) {
+  this.count = initialCount
+}
+Foo.prototype.incrementCount = function () {
+  this.count++
+}
 const o1 = new Foo(10) // o1: { count: 10 } 
 o1.incrementCount()
 o1.count // => 11
@@ -179,8 +185,12 @@ on `this`.](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20
 
 ## Implementing Inheritance with Function Objects
 
-To make JavaScript functions behave as classes do in most OO languages, we
-need to do a bit more work. One such thing is calling the "parent"
+We've seen how the prototype chain can be used to enable objects to delegate
+functionality to other objects; JavaScript is a dynamic, prototype-based language.
+We can also use it as a class-based OO language; we've already seen some of the
+hallmarks - using `new` to create new objects, the `constructor` property.
+
+But there are a few more things that happen in class-based languages. One such thing is calling the "parent"
 constructor; when the sub-class is instantiated, one would expect the
 super-class constructor to be called. Therefore, we need to make sure to call
 the parent function, which is also the super-class constructor:
@@ -212,9 +222,7 @@ the `Foo` function to setup `Bar`'s prototype.
 
 ## Shadowing
 
-In most cases, when setting the value of a property, the result will be the
-creation or modification of a property on the target object (`bar` in the
-examples below). But there are two situations in which that will not happen,
+In most cases, creating a property on an object will succeed. But there are two situations in which that will not happen,
 at least not as expected. Both of them occur when JS finds an object in the
 target object's prototype chain which already has a property with the same
 name as the one we're trying to set/create on the target object.
