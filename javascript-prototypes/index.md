@@ -2,19 +2,6 @@
 
 <small>Author: <a href="https://mrotaru.co.uk">Mihai Rotaru</a></small> <small>Date: 2018-06-14</small>
 
-JavaScript is a prototype-based language, thus it should come as no surprise
-that a good grasp of how prototypes work is essential to any serious
-JavaScript developer. I've struggled with it, until I read [Kyle Simpson's
-book](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch5.md)
-on the subject, which I cannot recommend enough. I wrote this post to
-solidify my understanding; "if you can't explain it, you don't understand
-it". As it turns out, the prototype mechanism is actually very simple and
-elegant. However, it is not ideally suited for object-oriented programming as
-in other languages, such as Java or C++. Using it like that complicates
-things, but given that it is a common pattern it is still important to
-understand all the implications; ES6 `class`es do not supersede the prototype
-mechanism.
-
 ## What is a Prototype ?
 
 A prototype is just an object that is referenced by _other_ objects via an
@@ -41,7 +28,7 @@ foo.toString() // => '[object Object]' - inherited from Object.prototype
 foo.hasOwnProperty('x') // => true
 foo.hasOwnProperty('toString') // => false
 ```
-![Direct, explicit prototype link](./fig-1.svg)
+![Default prototype link](fig-1.svg)
 
 ## Creating Prototype Links - Explicitly
 
@@ -91,7 +78,7 @@ foo.toString() // => 'function foo(){}'
 foo.toString === Function.prototype.toString // => true
 foo.toString === Object.prototype.toString // => false
 ```
-![Direct, explicit prototype link](./fig-3.svg)
+![Function object](./fig-3.svg)
 
 ## Creating Prototype Links - Implicitly
 
