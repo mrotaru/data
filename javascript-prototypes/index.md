@@ -301,3 +301,10 @@ Reading the value of a property that is not on the target object will
 traverse the prototype chain and return the first one found, or `undefined`,
 whereas the algorithm for setting such properties is more complex, calling
 the first found setter and preventing the shadowing of read-only properties.
+
+## Resources
+
+- [You Don't Know JS: this & Object Prototypes](https://www.ebooks.com/1734321/you-don-t-know-js-this-object-prototypes/simpson-kyle/) ([github](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&%20object%20prototypes/README.md#you-dont-know-js-this--object-prototypes)) (The YDKJS series is the best resource for learning JS in-depth)
+- [Object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming)
+- [Prototype-based programming](https://en.wikipedia.org/wiki/Prototype-based_programming)
+- [Class-based programming](https://en.wikipedia.org/wiki/Class-based_programming)
