@@ -5,13 +5,13 @@
 ## What is a Prototype ?
 
 A prototype is just an object that is referenced by _other_ objects via an
-internal property. This allows one object access to properties (including
-functions) which are actually set on _another_ object. The JavaScript spec
-calls this internal property "`[[Prototype]]` internal slot"
+internal property. This allows those other objects access to properties (including
+functions) which are actually set on the prototype object. The JavaScript spec
+calls the internal property "`[[Prototype]]` internal slot"
 [(§ 9.1)](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-ordinary-object-internal-methods-and-internal-slots)
 and it is _not_ the same thing as the `prototype` property; more on this later. When we say that
 "`foo` is prototype-linked to `bar`" it means that `foo`'s internal
-`[[Prototype]]` is a reference to `bar`.
+`[[Prototype]]` is a reference to `bar`; therefore, `foo` will have access to `bar`'s properties.
 
 ## Default Prototype Links
 
@@ -37,7 +37,7 @@ one is indirect (implicit). The direct way is by using [`Object.create()`](https
 It will return a new object,
 with it's internal `[[Prototype]]` pointing to the object provided as the first parameter. `[[Prototype]]`
 can be accessed directly as the `__proto__` property, although it is recommend to use `Object.getPrototypeOf()` instead.
-The `prototype` property is **not** synonymous with `[[Prototype]]`, more on this later on.
+As mentioned before, the `prototype` property is **not** synonymous with `[[Prototype]]`.
 
 ```js
 const foo = { x: 42 }
@@ -67,8 +67,9 @@ That's where methods like `call()`, `apply()` and `bind()` come from. It is also
 interesting to note that `Function.prototype` also has it's own `toString()`,
 different from `Object.prototype.toString()`. When accessing a property on an
 object, the closest one in the prototype chain will be used. This can lead to
-the situation we have with `toString()`, where one property _shadows_ another.
-This is also known as _overriding_.
+the situation we have with `toString()`, where one property _shadows_ another
+property with the same name, by virtue of being found first during the prototype
+chain traversal. This is also known as _overriding_.
 
 ```js
 function foo() {} // foo is a function object
@@ -133,9 +134,10 @@ obj.constructor === bar // => true - even though foo created obj
 
 ### Constructor Functions
 
-In JavaScript, **any** function becomes a constructor when called with `new`.
+In JavaScript, almost **any** function becomes a constructor when called with `new`.
 As we saw previously, even a function like `function foo () {}` will still
-return a new object, prototype-linked to `foo.prototype`.
+return a new object, prototype-linked to `foo.prototype`. The most notable exception
+consists of arrow functions, which cannot be called with `new`.
 
 Just before executing a constructor call, JavaScript will create a brand new
 object and it will set `this` to point to it for the duration of the
@@ -217,19 +219,24 @@ name as the one we're trying to set/create on the target object.
 ### Situation 1 - The Property is a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set)
 
 In JS, if we want to run a function when setting a property, we can can use a
-setter. In this case, **JS will call the setter**. The setter function can
-use `this`, which will be a reference to the target object, _not_ the linked
-object:
+setter. If we're trying to set a property on an object, and another object in
+the prototype chain has a property with the same name that is a setter, **JS
+will call the setter**. The setter function can use `this`, which will be a
+reference to the target object, _not_ the linked object:
 
 ```js
 const foo = {
   set myProp(value) {
+    // this function will be called when trying to set 'myProp' on:
+    //   1. foo itself
+    //   2. objects which have foo in their prototype chain.
     this.x = value + 1
+    // this.myProp = value + 1 // DON'T DO THIS - generates an infinite loop !
   }
 }
 const bar = Object.create(foo) // 'bar' is the target object
-bar.myProp = 10 // the setter will be called; `this` will be `bar`
-bar.myProp // => undefined
+bar.myProp = 10 // the setter will be called with 10 as a parameter; `this` will be 'bar'
+bar.myProp // => undefined - the setter didn't create a 'myProp' property, it created an 'x' property 
 bar.x // => 11
 ```
 
